@@ -1,84 +1,78 @@
 package handlers
 
 import (
-     "encoding/json"
-     "net/http"
-     "fmt"
-     "github.com/gorilla/mux"   
-     
-     "database/sql"
-     _ "github.com/lib/pq"
+	"encoding/json"
+	"net/http"
 
-     )
-
-type Person struct {
-     ID           string    `json:"id,omitempty"`
-     Firstname    string    `json:"firstname,omitempty"`
-     Lastname     string    `json:"lastname,omitempty"`
-     Status       string    `json:"status,omitempty`
-     Address      *Address  `json:"address,omitempty"`
-}
-
-type Address struct {
-   City           string    `json:"city,omitempty"`
-   State          string    `json:"state,omitempty"`
-}
+	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
+)
 
 var people []Person
 
-
-func GetPeople(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-     err := db.Ping()
-     if err != nil {
-       panic(err)
-     }
-   
-     fmt.Println("Successfully connected!")
-
-     json.NewEncoder(w).Encode(people)
-
-}
-func GetPerson(w http.ResponseWriter, r *http.Request) {
-     params := mux.Vars(r)
-     for _, item := range people {
-          if item.ID == params["id"] {
-               json.NewEncoder(w).Encode(item)
-               return
-          }
-     }
-     json.NewEncoder(w).Encode(&Person{})
+// Healthcheck .
+func (c *Controller) Healthcheck(w http.ResponseWriter, req *http.Request) {
+	if err := c.PingDB(); err != nil {
+		// Return error.
+		logrus.WithError(err).Debugf("Failed to ping DB.")
+		w.WriteHeader(http.StatusTeapot)
+	}
+	// Success.
+	w.WriteHeader(http.StatusNoContent)
 }
 
-func GetStatus(w http.ResponseWriter, r *http.Request) {
-     params := mux.Vars(r)
-     for _, item := range people {
-          if item.ID == params["id"] {
-               json.NewEncoder(w).Encode(item.Status)
-               return
-          }
-     }
-     json.NewEncoder(w).Encode("")
+// GetPeople .
+func (c *Controller) GetPeople(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(&people)
 }
 
-func SetStatus(w http.ResponseWriter, r *http.Request) {
-     params := mux.Vars(r)
-     for _, item := range people {
-          if item.ID == params["id"] {
-               item.Status = params["newstatus"]
-               json.NewEncoder(w).Encode(people)
-               return
-          }
-     }
-     json.NewEncoder(w).Encode("User with given id not found")
+// GetPerson .
+func (c *Controller) GetPerson(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	for _, item := range people {
+		if item.ID == params["id"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(&Person{})
 }
 
-func CreatePerson(w http.ResponseWriter, r *http.Request) {
-     params := mux.Vars(r)
-     var person Person
-     _ = json.NewDecoder(r.Body).Decode(&person)
-     person.ID = params["id"]
-     people = append(people, person)
-     json.NewEncoder(w).Encode(people)
+// GetStatus .
+func (c *Controller) GetStatus(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	for _, item := range people {
+		if item.ID == params["id"] {
+			json.NewEncoder(w).Encode(item.Status)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode("")
 }
-func DeletePerson(w http.ResponseWriter, r *http.Request) {
+
+// SetStatus .
+func (c *Controller) SetStatus(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	for _, item := range people {
+		if item.ID == params["id"] {
+			item.Status = params["newstatus"]
+			json.NewEncoder(w).Encode(people)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode("User with given id not found")
+}
+
+// CreatePerson .
+func (c *Controller) CreatePerson(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var person Person
+	_ = json.NewDecoder(r.Body).Decode(&person)
+	person.ID = params["id"]
+	people = append(people, person)
+	json.NewEncoder(w).Encode(people)
+}
+
+// DeletePerson .
+func (c *Controller) DeletePerson(w http.ResponseWriter, r *http.Request) {
 }
