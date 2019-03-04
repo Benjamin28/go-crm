@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	_ "github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
-
-var people []Person
 
 // Healthcheck .
 func (c *Controller) Healthcheck(w http.ResponseWriter, req *http.Request) {
@@ -22,57 +20,60 @@ func (c *Controller) Healthcheck(w http.ResponseWriter, req *http.Request) {
 }
 
 // GetPeople .
-func (c *Controller) GetPeople(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(&people)
+func (c *Controller) GetClients(w http.ResponseWriter, r *http.Request) {
+	// json.NewEncoder(w).Encode(&people)
+	w.WriteHeader(404)
 }
 
 // GetPerson .
-func (c *Controller) GetPerson(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	for _, item := range people {
-		if item.ID == params["id"] {
-			json.NewEncoder(w).Encode(item)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode(&Person{})
+func (c *Controller) GetClient(w http.ResponseWriter, r *http.Request) {
+	//params := mux.Vars(r)
+	// for _, item := range people {
+	// 	if item.ID == params["id"] {
+	// 		json.NewEncoder(w).Encode(item)
+	// 		return
+	// 	}
+	// }
+	w.WriteHeader(404)
+	// json.NewEncoder(w).Encode(&Person{})
 }
 
 // GetStatus .
 func (c *Controller) GetStatus(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	for _, item := range people {
-		if item.ID == params["id"] {
-			json.NewEncoder(w).Encode(item.Status)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode("")
+	//params := mux.Vars(r)
+	// for _, item := range people {
+	// 	if item.ID == params["id"] {
+	// 		json.NewEncoder(w).Encode(item.Status)
+	// 		return
+	// 	}
+	// }
+	//json.NewEncoder(w).Encode("")
+	w.WriteHeader(404)
 }
 
 // SetStatus .
 func (c *Controller) SetStatus(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	for _, item := range people {
-		if item.ID == params["id"] {
-			item.Status = params["newstatus"]
-			json.NewEncoder(w).Encode(people)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode("User with given id not found")
+	//params := mux.Vars(r)
+	// for _, item := range people {
+	// 	if item.ID == params["id"] {
+	// 		item.Status = params["newstatus"]
+	// 		json.NewEncoder(w).Encode(people)
+	// 		return
+	// 	}
+	//}
+	w.WriteHeader(404)
 }
 
-// CreatePerson .
-func (c *Controller) CreatePerson(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	var person Person
-	_ = json.NewDecoder(r.Body).Decode(&person)
-	person.ID = params["id"]
-	people = append(people, person)
-	json.NewEncoder(w).Encode(people)
+// CreateClient .
+func (c *Controller) CreateClient(w http.ResponseWriter, r *http.Request) {
+	//params := mux.Vars(r)
+	var client Client
+	_ = json.NewDecoder(r.Body).Decode(&client)
+	//people = append(people, person)
+	//insert client into DB
+	w.WriteHeader(200)
 }
 
-// DeletePerson .
-func (c *Controller) DeletePerson(w http.ResponseWriter, r *http.Request) {
+// DeleteClient .
+func (c *Controller) DeleteClient(w http.ResponseWriter, r *http.Request) {
 }

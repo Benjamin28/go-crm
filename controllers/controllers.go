@@ -56,3 +56,11 @@ func (c *Controller) PingDB() error {
 	}
 	return nil
 }
+
+func (c *Controller) ExecSQL(sqlStatement string) error {
+	_, err := c.db.Exec(sqlStatement)
+	if err != nil{
+		panic(err)
+	}
+	return nil
+}
