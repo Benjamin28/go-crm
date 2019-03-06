@@ -8,12 +8,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Controller.
+// Controller .
 type Controller struct {
-	db *sql.DB
+	Db *sql.DB
 }
 
-// Credentials.
+// Credentials .
 type Credentials struct {
 	Host string
 	Port int
@@ -33,7 +33,7 @@ func NewController() *Controller {
 	if err != nil {
 		panic(err)
 	}
-	c.db = db
+	c.Db = db
 
 	return &c
 }
@@ -51,16 +51,8 @@ func newCredentials() Credentials {
 
 // PingDB pings the database.
 func (c *Controller) PingDB() error {
-	if err := c.db.Ping(); err != nil {
+	if err := c.Db.Ping(); err != nil {
 		return errors.Wrap(err, "db ping")
-	}
-	return nil
-}
-
-func (c *Controller) ExecSQL(sqlStatement string) error {
-	_, err := c.db.Exec(sqlStatement)
-	if err != nil{
-		panic(err)
 	}
 	return nil
 }
